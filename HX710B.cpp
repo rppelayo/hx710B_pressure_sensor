@@ -1,9 +1,9 @@
 /**
  *
- * HX710B library for Arduino
- * https://github.com/kurimawxx00/HX710B
+ * HX710B library for Arduino with MPS20N0040D pressure sensor support
+ * https://github.com/kurimawxx00/hx710B_pressure_sensor
  * 
- * Based on HX710B library by https://github.com/bogde/
+ * Based on HX711 library by https://github.com/bogde/
  *
  * MIT License
  * (c) 2021 Roland Pelayo
@@ -219,23 +219,23 @@ long HX710B::read_average(byte times) {
 	return sum / times;
 }
 
-float HX710B::press_pascals(){
-    float value = ((read()*RES) + 2.5)*20 - 50;
+float HX710B::pascal(){
+    float value = ((read_average()*RES) + 2.5)*20 - 50;
     return value;
 }
 
-float HX710B::press_atm(){
-    float value = press_pascals()*1.45038E-4;
+float HX710B::atm(){
+    float value = pascal()*1.45038E-4;
     return value;
 }
 
-float HX710B::press_mmHg(){
-    float value = press_pascals()*0.00750062;
+float HX710B::mmHg(){
+    float value = pascal()*0.00750062;
     return value;
 }
 
-float HX710B::press_psi(){
-    float value = press_pascals()*0.000145038;
+float HX710B::psi(){
+    float value = pascal()*0.000145038;
     return value;
 }
 

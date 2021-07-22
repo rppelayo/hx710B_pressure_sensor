@@ -1,0 +1,5 @@
+{
+    "board": "arduino:avr:uno",
+    "port": "COM3",
+    "sketch": "HX710B_Basic.ino"
+}
