@@ -225,7 +225,7 @@ float HX710B::pascal(){
 }
 
 float HX710B::atm(){
-    float value = pascal()*1.45038E-4;
+    float value = pascal()*9.86923E-6;
     return value;
 }
 
