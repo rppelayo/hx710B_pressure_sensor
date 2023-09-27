@@ -220,7 +220,7 @@ long HX710B::read_average(byte times) {
 }
 
 float HX710B::pascal(){
-    float value = (read_average()*RES) *200 + 500;
+    float value = (read_average()*RES) *20 - 50;
     return value;
 }
 
