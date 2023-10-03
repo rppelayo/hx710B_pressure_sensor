@@ -225,17 +225,17 @@ float HX710B::pascal(){
 }
 
 float HX710B::atm(){
-    float value = pascal()*9.86923E-6;
+    float value = pascal()*9.86923E-3;
     return value;
 }
 
 float HX710B::mmHg(){
-    float value = pascal()*0.00750062;
+    float value = pascal()*7.50062;
     return value;
 }
 
 float HX710B::psi(){
-    float value = pascal()*0.000145038;
+    float value = pascal()*0.145038;
     return value;
 }
 
