@@ -1,13 +1,13 @@
 #include "HX710B.h"
 
-const int DOUT = 2;   //sensor data pin
-const int SCLK  = 3;   //sensor clock pin
+const int DOUT_Pin = 2;   //sensor data pin
+const int SCLK_Pin  = 3;   //sensor clock pin
 
 HX710B pressure_sensor; 
 
 void setup() {
   Serial.begin(57600);
-  pressure_sensor.begin(DOUT, SCLK);
+  pressure_sensor.begin(DOUT_Pin, SCLK_Pin);
 }
 
 void loop() {
