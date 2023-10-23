@@ -63,19 +63,20 @@ uint8_t shiftInSlow(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder) {
 #define SHIFTIN_WITH_SPEED_SUPPORT(data,clock,order) shiftIn(data,clock,order)
 #endif
 
-
 HX710B::HX710B() {
 }
 
 HX710B::~HX710B() {
 }
 
-void HX710B::begin(byte dout, byte pd_sck) {
+void HX710B::begin(byte dout, byte pd_sck, byte gain) {
 	PD_SCK = pd_sck;
 	DOUT = dout;
 
 	pinMode(PD_SCK, OUTPUT);
 	pinMode(DOUT, INPUT_PULLUP);
+
+	setGain(gain);
 
 }
 
@@ -83,6 +84,22 @@ bool HX710B::is_ready() {
 	return digitalRead(DOUT) == LOW;
 }
 
+void HX710B::setGain(byte gain)
+{
+	switch(gain)
+	{
+		case 128:		// channel A, gain factor 128
+				GAIN = 1;
+				break;
+		case 64:		// channel A, gain factor 64
+				GAIN = 3;
+				break;
+		case 32:		// channel B, gain factor 32
+				GAIN = 2;
+				break;
+	}
+
+}
 
 long HX710B::read() {
 
@@ -130,7 +147,7 @@ long HX710B::read() {
 	data[0] = SHIFTIN_WITH_SPEED_SUPPORT(DOUT, PD_SCK, MSBFIRST);
 
 	// Set the channel and the gain factor for the next reading using the clock pin.
-	for (unsigned int i = 0; i < 128; i++) {
+	for (unsigned int i = 0; i < GAIN; i++) {
 		digitalWrite(PD_SCK, HIGH);
 		#if ARCH_ESPRESSIF
 		delayMicroseconds(1);
@@ -212,15 +229,13 @@ long HX710B::read_average(byte times) {
 	long sum = 0;
 	for (byte i = 0; i < times; i++) {
 		sum += read();
-		// Probably will do no harm on AVR but will feed the Watchdog Timer (WDT) on ESP.
-		// https://github.com/bogde/HX710B/issues/73
 		delay(0);
 	}
 	return sum / times;
 }
 
 float HX710B::pascal(){
-    float value = (read_average()*RES) *20 - 50;
+    float value = ((read_average(READ_TIMES)-OFFSET)*RES) *20 - 50;
     return value;
 }
 

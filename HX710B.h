@@ -23,7 +23,9 @@ class HX710B
 	private:
 		byte PD_SCK;	// Power Down and Serial Clock Input Pin
 		byte DOUT;		// Serial Data Output Pin
-		long OFFSET = 0;	// used for tare weight
+		byte GAIN;
+		long READ_TIMES = 10;
+		long OFFSET = -540000;;	// used for tare weight
 		float SCALE = 1;	// used to return weight in grams, kg, ounces, whatever
         float RES = 2.98023e-7;
 	public:
@@ -37,7 +39,9 @@ class HX710B
 		// - With a gain factor of 64 or 128, channel A is selected
 		// - With a gain factor of 32, channel B is selected
 		// The library default is "128" (Channel A).
-		void begin(byte dout, byte pd_sck);
+		void begin(byte dout, byte pd_sck, byte gain);
+
+		void setGain(byte gain);
 
 		// Check if HX710B is ready
 		// from the datasheet: When output data is not ready for retrieval, digital output pin DOUT is high. Serial clock
