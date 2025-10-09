@@ -28,6 +28,9 @@ class HX710B
 		long OFFSET = -540000;;	// used for tare weight
 		float SCALE = 1;	// used to return weight in grams, kg, ounces, whatever
         float RES = 2.98023e-7;
+		// --- Calibration support (linear P = m*raw + b) ---
+		double CAL_M = NAN;   // slope
+  		double CAL_B = NAN;   // offset
 	public:
 
 		HX710B();
@@ -39,7 +42,7 @@ class HX710B
 		// - With a gain factor of 64 or 128, channel A is selected
 		// - With a gain factor of 32, channel B is selected
 		// The library default is "128" (Channel A).
-		void begin(byte dout, byte pd_sck, byte gain);
+		void begin(byte dout, byte pd_sck, byte gain = 128);
 
 		void setGain(byte gain);
 
@@ -98,6 +101,24 @@ class HX710B
 
 		// wakes up the chip after power down mode
 		void power_up();
+
+		 // Set / get / clear calibration
+		inline void setCalibration(double m, double b) { CAL_M = m; CAL_B = b; }
+		inline bool hasCalibration() const { return !isnan(CAL_M) && !isnan(CAL_B); }
+		inline void clearCalibration() { CAL_M = NAN; CAL_B = NAN; }
+		inline void getCalibration(double& m, double& b) const { m = CAL_M; b = CAL_B; }
+
+		// Raw helpers (explicit names so sketches don’t rely on internals)
+		inline long readRaw() { return read(); }
+		inline long readRawAverage(byte times) { return read_average(times); }
+
+		// Calibrated pressure in kPa (uses P = m*raw + b when set; otherwise falls back)
+		float pascalCal();      // returns Pascals (Pa)
+		float kPaCal();         // returns kPa
+		// Other units using calibrated kPa
+		float psiCal() { return kPaCal() * 0.145038f; }   // returns PSI
+		float mmHgCal() { return kPaCal() * 7.50062f; }   // returns mmHg
+		float atmCal() { return kPaCal() * 0.00986923f; }  // returns atm
 };
 
 #endif /* HX710B_h */

@@ -234,9 +234,33 @@ long HX710B::read_average(byte times) {
 	return sum / times;
 }
 
+float HX710B::kPaCal() {
+  // Average a few raw samples to reduce noise
+  const byte N = 25;
+  long raw = read_average(N);  
+
+  if (hasCalibration()) {
+    // Linear calibrated model: P(kPa) = m*raw + b
+    double PkPa = CAL_M * (double)raw + CAL_B;
+    return (float)PkPa;
+  }
+
+  // --- Fallback (no calibration): preserve your current behavior ---
+  // If your project defines RES/READ_TIMES/SCALE meaningfully, keep it.
+  // Otherwise, consider replacing this with a datasheet-based linear estimate.
+  long base = read_average(READ_TIMES) - OFFSET;
+  float Ppas = (base * RES) * 20.0f - 50.0f;  // your original logic
+  return Ppas / 1000.0f; // convert Pa->kPa for consistency
+}
+
+float HX710B::pascalCal() {
+  // Return Pascals using the calibrated (or fallback) kPa method
+  return kPaCal() * 1000.0f;
+}
+
 float HX710B::pascal(){
-    float value = ((read_average(READ_TIMES)-OFFSET)*RES) *20 - 50;
-    return value;
+  // Now returns calibrated Pascals when calibration is set
+  return pascalCal();
 }
 
 float HX710B::atm(){
